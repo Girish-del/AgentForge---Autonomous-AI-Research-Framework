@@ -1,0 +1,20 @@
+AgentForge Production Plan
+==========================
+
+Phase 1
+- Ship monorepo structure
+- Stand up backend API skeleton
+- Stand up frontend Vite app
+- Add docker compose and CI
+
+Phase 2
+- Add persistent database integration
+- Add real FAISS + sentence-transformer memory
+- Add authentication and role model
+
+Phase 3
+- Add autonomous agent loop with checkpoints and retries
+- Add evaluation harness and benchmark jobs
+
+Phase 4
+- Add observability, dashboards, and release hardening

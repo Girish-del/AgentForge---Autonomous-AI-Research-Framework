@@ -1,0 +1,6 @@
+flowchart TD
+    UI[Frontend Vite React] --> API[FastAPI Backend]
+    API --> ORCH[Orchestrator Pipeline]
+    ORCH --> AGENTS[Support and Domain Agents]
+    ORCH --> MEM[FAISS Memory + Embeddings]
+    ORCH --> SVC[Database and LLM Services]
