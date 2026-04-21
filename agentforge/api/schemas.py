@@ -9,12 +9,12 @@ class GoalRequest(BaseModel):
     max_iterations: int = Field(default=3, ge=1, le=20)
     target_metric: float = Field(default=0.9, ge=0.0, le=1.0)
     task_type: Literal[
-        "image_classification",
-        "object_detection",
-        "language_understanding",
-        "vision_language",
-        "trajectory_prediction",
-    ] = Field(default="image_classification")
+        "agent_planning",
+        "agent_tool_use",
+        "agent_memory",
+        "agent_collaboration",
+        "agent_evaluation",
+    ] = Field(default="agent_planning")
 
 
 class RunResponse(BaseModel):

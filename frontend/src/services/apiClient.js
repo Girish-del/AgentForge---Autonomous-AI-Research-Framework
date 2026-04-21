@@ -5,4 +5,12 @@ const apiClient = axios.create({
   timeout: 15000,
 });
 
+apiClient.interceptors.request.use((config) => {
+  const token = sessionStorage.getItem("agentforge_token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export default apiClient;

@@ -6,21 +6,49 @@ function LoginPage() {
   const [email, setEmail] = useState("demo@agentforge.ai");
   const [password, setPassword] = useState("password");
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    const response = await apiClient.post("/auth/login", { email, password });
-    setMessage(`Token: ${response.data.access_token}`);
+    setError("");
+    setMessage("");
+    try {
+      const response = await apiClient.post("/auth/login", { email, password });
+      sessionStorage.setItem("agentforge_token", response.data.access_token);
+      setMessage("Authenticated. Token saved for API requests.");
+    } catch (requestError) {
+      setError(requestError?.response?.data?.detail || "Login failed.");
+    }
   };
 
   return (
-    <form onSubmit={handleLogin}>
+    <section className="panel">
       <h2>Login</h2>
-      <input value={email} onChange={(e) => setEmail(e.target.value)} />
-      <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" />
-      <button type="submit">Login</button>
-      <div>{message}</div>
-    </form>
+      <p>Sign in to manage research loops and experiments.</p>
+      <form className="form-grid" onSubmit={handleLogin}>
+        <label>
+          Email
+          <input
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            type="email"
+            required
+          />
+        </label>
+        <label>
+          Password
+          <input
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            type="password"
+            required
+          />
+        </label>
+        <button type="submit">Login</button>
+      </form>
+      {message && <p className="success">{message}</p>}
+      {error && <p className="error">{error}</p>}
+    </section>
   );
 }
 

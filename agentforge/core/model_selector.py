@@ -1,9 +1,9 @@
 MODEL_MATRIX: dict[str, tuple[str, str]] = {
-    "image_classification": ("vit_base_patch16_224", "resnet50"),
-    "object_detection": ("yolov9", "faster_rcnn"),
-    "language_understanding": ("claude_sonnet", "gpt_4o_mini"),
-    "vision_language": ("gemini_1_5_pro", "gpt_4v"),
-    "trajectory_prediction": ("trajectory_transformer", "lstm"),
+    "agent_planning": ("claude_opus_planner", "gpt_4o_planner"),
+    "agent_tool_use": ("gpt_4o_toolformer", "claude_sonnet_tools"),
+    "agent_memory": ("claude_sonnet_memory", "gpt_4o_mini_memory"),
+    "agent_collaboration": ("claude_multi_agent", "gpt_swarm"),
+    "agent_evaluation": ("deepseek_eval_runner", "claude_eval"),
 }
 
 

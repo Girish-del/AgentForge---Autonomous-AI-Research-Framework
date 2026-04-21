@@ -1,5 +1,10 @@
 function Spinner() {
-  return <div>Loading...</div>;
+  return (
+    <div className="spinner" role="status" aria-label="Loading">
+      <span />
+      Loading...
+    </div>
+  );
 }
 
 export default Spinner;

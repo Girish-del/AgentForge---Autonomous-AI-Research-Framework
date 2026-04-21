@@ -9,12 +9,12 @@ class GoalRequest(BaseModel):
     max_iterations: int = Field(default=3, ge=1, le=20)
     target_metric: float = Field(default=0.9, ge=0.0, le=1.0)
     task_type: Literal[
-        "image_classification",
-        "object_detection",
-        "language_understanding",
-        "vision_language",
-        "trajectory_prediction",
-    ] = "image_classification"
+        "agent_planning",
+        "agent_tool_use",
+        "agent_memory",
+        "agent_collaboration",
+        "agent_evaluation",
+    ] = "agent_planning"
 
 
 class RunResponse(BaseModel):
@@ -22,6 +22,18 @@ class RunResponse(BaseModel):
     best_metric: float
     total_spend_usd: float
     history: list[dict]
+
+
+class RunHistoryRecord(BaseModel):
+    id: int
+    statement: str
+    task_type: str
+    target_metric: float
+    best_metric: float
+    iterations: int
+    total_spend_usd: float
+    history: list[dict]
+    created_at: str
 
 
 class LoginRequest(BaseModel):

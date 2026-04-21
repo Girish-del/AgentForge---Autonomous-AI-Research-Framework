@@ -19,7 +19,7 @@ class ResearchGoal:
     budget_usd: float = 100.0
     max_iterations: int = 3
     target_metric: float = 0.9
-    task_type: str = "image_classification"
+    task_type: str = "agent_planning"
     iteration_cost_usd: float = 5.0
 
 

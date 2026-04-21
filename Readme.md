@@ -1,7 +1,7 @@
 # AgentForge - Autonomous AI Research Framework
 
 AgentForge is a production-oriented multi-agent research orchestration platform.  
-It accepts high-level research goals, routes them through an orchestrator pipeline, runs iterative improvement loops, and exposes results through a FastAPI backend + React frontend.
+It accepts high-level research goals, routes them through an orchestrator pipeline, runs iterative improvement loops, and exposes results through a FastAPI backend + React frontend with a complete HTML/CSS user interface.
 
 ## Architecture
 
@@ -42,11 +42,11 @@ Full Mermaid diagram: `docs/architecture.mmd`
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 18, Vite, React Router, Axios |
+| Frontend | React 18, Vite, semantic HTML, custom CSS, React Router, Axios |
 | Backend | Python 3.11+, FastAPI, Uvicorn |
 | AI / ML | FAISS (`faiss-cpu`), Sentence-Transformers (planned runtime integration) |
 | Auth | JWT-ready service scaffold |
-| Data | PostgreSQL (via Docker Compose) |
+| Data | PostgreSQL (run history persisted from `/api/orchestrator/run`) |
 | Deployment | Docker and Docker Compose |
 | CI | GitHub Actions |
 | Formatting | Black config in `pyproject.toml` |
@@ -153,6 +153,19 @@ npm run dev
 
 Frontend: `http://localhost:5173`
 
+### 4.1) Verify PostgreSQL persistence
+
+The backend now creates and uses a `run_history` table automatically at startup.  
+If PostgreSQL is unavailable, the API still runs and reports database status in health checks.
+
+Quick local option (Docker only for DB):
+
+```bash
+docker compose up -d postgres
+```
+
+Then run backend + frontend normally. Each dashboard experiment is saved in PostgreSQL and rendered in the "Saved Runs" panel.
+
 ### 5) Docker alternative
 
 ```bash
@@ -181,6 +194,7 @@ Never commit `.env`. Keep secrets local.
 - `GET /api/health`
 - `POST /api/auth/login`
 - `POST /api/orchestrator/run`
+- `GET /api/orchestrator/runs?limit=10`
 
 ## Running Tests
 
@@ -206,6 +220,7 @@ CI executes on every push and pull request via `.github/workflows/ci.yml`.
 2. Use Login page to call `/api/auth/login`.
 3. Backend returns `access_token` (development token scaffold).
 4. Dashboard can trigger `/api/orchestrator/run`.
+5. Successful runs are persisted to PostgreSQL and available from `/api/orchestrator/runs`.
 
 ## Orchestration Loop (Current)
 
@@ -214,11 +229,18 @@ The pipeline currently executes a foundation loop:
 1. Parse intent from goal statement
 2. Detect planning conflicts (budget vs iteration settings)
 3. Route task to model selection logic
-4. Run iterative improvement loop until:
+4. For each iteration, autonomously:
+   - collect agent telemetry/task data
+   - train and evaluate a model/workflow candidate
+   - identify failure modes
+   - propose and validate an improvement strategy
+   - change model/workflow when needed
+   - rerun the experiment with updated settings
+5. Run iterative improvement loop until:
    - target metric reached, or
    - budget exhausted, or
    - max iterations reached
-5. Return structured run history
+6. Return structured run history with per-iteration actions
 
 ## Roadmap
 
