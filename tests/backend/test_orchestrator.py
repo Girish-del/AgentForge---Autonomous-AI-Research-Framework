@@ -21,6 +21,9 @@ def test_orchestrator_run() -> None:
     body = response.json()
     assert body["iterations"] >= 1
     assert "history" in body
+    assert body["stop_reason"] in {"target_reached", "budget_exhausted", "max_iterations_reached"}
+    assert isinstance(body["report"], dict)
+    assert isinstance(body["traces"], list)
     first_entry = body["history"][0]
     assert "data_collection" in first_entry
     assert first_entry["training_status"] == "completed"

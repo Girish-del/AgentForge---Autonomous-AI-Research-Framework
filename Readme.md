@@ -250,3 +250,20 @@ The pipeline currently executes a foundation loop:
 - Expand evaluation harness under `eval/`
 - Add observability and production deployment manifests
 
+## Comprehensive Plan Alignment (April 2026)
+
+The `agentforge/` package now mirrors the comprehensive plan scaffold:
+
+- Full research task DAG in `agentforge/core/orchestrator.py`
+- Iterative collect -> select -> train -> evaluate -> analyze -> improve loop in `agentforge/core/agent_loop.py`
+- Model selector decision matrix aligned with the plan in `agentforge/mcp/training/select_model.py`
+- MCP tool catalog scaffold under `agentforge/mcp/`:
+  - `data/` (`fetch_dataset`, `run_simulation`, `generate_synthetic`, `label_with_vlm`)
+  - `training/` (`select_model`, `launch_training`, `hyperparameter_search`)
+  - `evaluation/` (`run_eval_suite`, `compute_metrics`, `failure_clustering`)
+  - `improvement/` (`propose_fix`, `apply_augmentation`, `swap_model`)
+  - `memory/` (`store_experiment`, `retrieve_similar`, `update_skill_library`)
+- Rich API response contract for `POST /research/run` with checkpoints and stop reasons.
+- Phase-3 scaffold for robotics simulation connector in `agentforge/robotics/ros_connector.py`
+- Phase-4 scaffold for observability tracing + report generation in both `agentforge/` and `backend/app/orchestrator/`
+

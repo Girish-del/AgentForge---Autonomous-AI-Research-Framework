@@ -22,11 +22,17 @@ def run_research(goal: GoalRequest) -> RunResponse:
             max_iterations=goal.max_iterations,
             target_metric=goal.target_metric,
             task_type=goal.task_type,
+            dataset_hint=goal.dataset_hint,
+            time_budget_minutes=goal.time_budget_minutes,
         )
     )
     return RunResponse(
         iterations=result.iteration,
         best_metric=result.best_metric,
         total_spend_usd=result.total_spend_usd,
+        stop_reason=result.stop_reason,
+        checkpoints=result.checkpoints,
+        report=result.report,
+        traces=result.traces,
         history=result.history,
     )

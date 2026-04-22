@@ -2,10 +2,16 @@ import json
 import os
 from typing import Any
 
-from psycopg import connect
-from psycopg.rows import dict_row
-from psycopg.types.json import Json
 from starlette.applications import Starlette
+
+try:
+    from psycopg import connect
+    from psycopg.rows import dict_row
+    from psycopg.types.json import Json
+except Exception:  # pragma: no cover - optional dependency guard
+    connect = None
+    dict_row = None
+    Json = None
 
 
 class DatabaseService:
@@ -17,6 +23,10 @@ class DatabaseService:
         self.connected = False
 
     def connect(self) -> None:
+        if connect is None:
+            self._connection_error = "psycopg is not installed."
+            self.connected = False
+            return
         if not self.database_url:
             self._connection_error = "DATABASE_URL is not configured."
             self.connected = False
@@ -47,7 +57,7 @@ class DatabaseService:
             self._connection_error = str(exc)
 
     def save_run(self, payload: dict[str, Any]) -> None:
-        if not self.connected:
+        if not self.connected or connect is None or Json is None:
             return
         with connect(self.database_url) as conn:
             with conn.cursor() as cur:
@@ -77,7 +87,7 @@ class DatabaseService:
             conn.commit()
 
     def get_runs(self, limit: int = 10) -> list[dict[str, Any]]:
-        if not self.connected:
+        if not self.connected or connect is None or dict_row is None:
             return []
         with connect(self.database_url, row_factory=dict_row) as conn:
             with conn.cursor() as cur:

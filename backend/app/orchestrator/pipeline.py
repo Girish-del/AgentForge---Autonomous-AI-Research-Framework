@@ -3,7 +3,9 @@ from app.agents.support_agent import SupportAgent
 from app.models.domain import LoopState, PlannedTask, ResearchGoal, TaskType
 from app.orchestrator.conflict_detector import ConflictDetector
 from app.orchestrator.intent_parser import IntentParser
+from app.orchestrator.reporting import generate_research_report
 from app.orchestrator.task_router import TaskRouter
+from app.orchestrator.tracing import TraceRecorder
 
 
 class Pipeline:
@@ -26,16 +28,21 @@ class Pipeline:
         ]
 
     def run(self, goal: ResearchGoal) -> LoopState:
+        tracer = TraceRecorder()
         inferred = self.intent_parser.parse(goal.statement)
         goal.task_type = goal.task_type or inferred["task_type"]
         conflicts = self.conflict_detector.detect(goal.budget_usd, goal.max_iterations, goal.iteration_cost_usd)
 
         state = LoopState()
         active_workflow = "baseline_workflow"
+        tracer.emit("pipeline_started", {"goal": goal.statement, "task_type": goal.task_type})
         for _ in range(goal.max_iterations):
             if state.total_spend_usd + goal.iteration_cost_usd > goal.budget_usd:
+                state.stop_reason = "budget_exhausted"
+                tracer.emit("budget_exhausted", {"spend": state.total_spend_usd, "budget": goal.budget_usd})
                 break
             state.iteration += 1
+            tracer.emit("iteration_started", {"iteration": state.iteration})
             routing = self.task_router.select_model(goal.task_type)
             data_summary = self._collect_data(goal, state.iteration)
             metric = self._train_and_evaluate(state.iteration)
@@ -67,8 +74,25 @@ class Pipeline:
                     "conflicts": conflicts,
                 }
             )
+            state.checkpoints.append(
+                {
+                    "iteration": state.iteration,
+                    "model": routing["selected"],
+                    "workflow": active_workflow,
+                }
+            )
+            tracer.emit("iteration_completed", state.history[-1])
             if state.best_metric >= goal.target_metric:
+                state.stop_reason = "target_reached"
+                tracer.emit("target_reached", {"metric": state.best_metric})
                 break
+        state.report = generate_research_report(
+            statement=goal.statement,
+            history=state.history,
+            best_metric=state.best_metric,
+            stop_reason=state.stop_reason,
+        )
+        state.traces = tracer.traces
         return state
 
     def _collect_data(self, goal: ResearchGoal, iteration: int) -> dict[str, str | int]:

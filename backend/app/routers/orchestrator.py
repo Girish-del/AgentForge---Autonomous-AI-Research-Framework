@@ -24,6 +24,9 @@ def run_pipeline(payload: GoalRequest, request: Request) -> RunResponse:
         iterations=result.iteration,
         best_metric=result.best_metric,
         total_spend_usd=result.total_spend_usd,
+        stop_reason=result.stop_reason,
+        report=result.report,
+        traces=result.traces,
         history=result.history,
     )
     try:

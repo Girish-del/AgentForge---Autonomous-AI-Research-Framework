@@ -14,13 +14,23 @@ class GoalRequest(BaseModel):
         "agent_memory",
         "agent_collaboration",
         "agent_evaluation",
-    ] = "agent_planning"
+        "image_classification",
+        "object_detection",
+        "language_understanding",
+        "vision_language",
+        "trajectory_prediction",
+        "low_latency_inference",
+        "generative_data",
+    ] = "language_understanding"
 
 
 class RunResponse(BaseModel):
     iterations: int
     best_metric: float
     total_spend_usd: float
+    stop_reason: str = "max_iterations_reached"
+    report: dict = Field(default_factory=dict)
+    traces: list[dict] = Field(default_factory=list)
     history: list[dict]
 
 

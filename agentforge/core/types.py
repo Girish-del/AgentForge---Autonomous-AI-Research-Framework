@@ -19,8 +19,10 @@ class ResearchGoal:
     budget_usd: float = 100.0
     max_iterations: int = 3
     target_metric: float = 0.9
-    task_type: str = "agent_planning"
+    task_type: str = "language_understanding"
     iteration_cost_usd: float = 5.0
+    time_budget_minutes: int = 60
+    dataset_hint: str = "auto"
 
 
 @dataclass(slots=True)
@@ -37,3 +39,7 @@ class LoopState:
     best_metric: float = 0.0
     total_spend_usd: float = 0.0
     history: list[dict[str, Any]] = field(default_factory=list)
+    stop_reason: str = "max_iterations_reached"
+    checkpoints: list[dict[str, Any]] = field(default_factory=list)
+    report: dict[str, Any] = field(default_factory=dict)
+    traces: list[dict[str, Any]] = field(default_factory=list)
