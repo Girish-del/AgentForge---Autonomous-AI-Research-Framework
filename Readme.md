@@ -10,6 +10,19 @@ the user-facing API and `agentforge/api/` for the comprehensive plan scaffold),
 PostgreSQL persistence for run history, and a Docker-Compose stack for the full local
 loop.
 
+
+## Project Preview
+
+## Login Page 
+
+image.png
+
+
+## Main Researh Page 
+
+image.png
+
+
 ## Architecture
 
 Full Mermaid diagram: [`docs/architecture.mmd`](docs/architecture.mmd).
@@ -37,6 +50,7 @@ Full Mermaid diagram: [`docs/architecture.mmd`](docs/architecture.mmd).
 └────────────────────────────────────────────────────────────────┘
 ```
 
+
 ## Tech Stack
 
 | Layer | Technology | Status |
@@ -57,56 +71,6 @@ Full Mermaid diagram: [`docs/architecture.mmd`](docs/architecture.mmd).
 | Containerization | Docker + Docker Compose (frontend, backend, postgres) | ✅ Implemented |
 | Formatting | Black, line-length 100 (`pyproject.toml`) | ✅ Configured |
 
-> Tailwind, TypeScript, LangGraph, MLflow, and OpenTelemetry appear in `Plan.md` as
-> aspirational targets. They are **not** yet wired into the running system.
-
-## Project Structure
-
-```text
-.
-├── frontend/                      # React 18 + Vite gamified UI
-│   ├── src/
-│   │   ├── components/            # HUD, AgentCard, MetricGauge, QuestLog,
-│   │   │                          # AchievementToast, StarField, Spinner
-│   │   ├── pages/                 # LoginPage, RegisterPage, DashboardPage
-│   │   ├── services/              # apiClient.js, gamification.js, agents.js
-│   │   ├── App.jsx, main.jsx, styles.css
-│   │   └── ...
-│   ├── package.json, vite.config.js, Dockerfile, index.html
-├── backend/                       # User-facing FastAPI app
-│   ├── app/
-│   │   ├── routers/               # auth, orchestrator, health
-│   │   ├── services/              # database, auth_service, llm_wrapper
-│   │   ├── orchestrator/          # intent_parser, task_router,
-│   │   │                          # conflict_detector, pipeline, reporting,
-│   │   │                          # tracing
-│   │   ├── memory/                # faiss_store, embeddings (stubs)
-│   │   ├── agents/                # support_agent, domain_agent
-│   │   └── models/                # schemas, domain dataclasses
-│   ├── requirements.txt, Dockerfile
-├── agentforge/                    # Comprehensive plan scaffold (separate FastAPI)
-│   ├── core/                      # orchestrator, agent_loop, model_selector,
-│   │                              # reporting, types
-│   ├── agents/                    # data_agent, training_agent, eval_agent,
-│   │                              # failure_analyst, improvement_agent
-│   ├── mcp/                       # data, training, evaluation, improvement, memory
-│   ├── memory/                    # vector_store, experiment_log
-│   ├── observability/             # tracer
-│   ├── robotics/                  # ros_connector (stub)
-│   └── api/                       # main.py exposing POST /research/run
-├── tests/backend/                 # pytest suite (health, auth, orchestrator)
-├── docs/                          # architecture.mmd, BUILD_PARTS_GUIDE.md,
-│                                  # PROJECT_PLAN.txt
-├── eval/                          # placeholder — Phase 4
-├── .github/workflows/ci.yml
-├── docker-compose.yml             # frontend + backend + postgres (pgvector image)
-├── pyproject.toml
-├── .env.example
-├── Plan.md                        # Comprehensive plan (vision)
-├── Project.md                     # ELI5 description
-├── AgentForge_Comprehensive_Plan.docx
-└── Readme.md                      # this file
-```
 
 ## The Gamified UI
 
@@ -137,19 +101,6 @@ operate.
 
 The gamification state lives entirely in `localStorage` under the key `agentforge_lab_v1`
 and is independent from the backend. Clearing your browser storage resets your level.
-
-Color tokens (defined in `frontend/src/styles.css` as CSS custom properties):
-
-| Token | Hex | Use |
-|---|---|---|
-| `--plasma` | `#00ffe1` | Primary cyan accents, focus rings, gauges |
-| `--magenta` | `#ff2b9d` | Secondary accent, gradients, highlights |
-| `--xp-gold` | `#ffd166` | Level/XP, achievements, gold tier |
-| `--success` | `#38f583` | Done states, target reached |
-| `--danger` | `#ff5d6c` | Error banners, streak chip |
-
-Fonts: **Orbitron** (display, numerics, agent IDs) + **Inter** (body, forms), loaded from
-Google Fonts in `frontend/index.html`.
 
 ## Setup Instructions
 
