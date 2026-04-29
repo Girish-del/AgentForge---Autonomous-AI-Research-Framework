@@ -15,12 +15,12 @@ loop.
 
 ## Login Page 
 
-![Login Page](Project Preview/Login Page.png)
+![Login Page](./Project%20Preview/Login%20Page.png)
 
 
 ## Main Researh Page 
 
-![Main Screen](Project Preview/Main Screen.png)
+![Main Screen](./Project%20Preview/Main%20Screen.png)
 
 ## Architecture
 
