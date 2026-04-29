@@ -1,6 +1,18 @@
 flowchart TD
-    UI[Frontend Vite React] --> API[FastAPI Backend]
-    API --> ORCH[Orchestrator Pipeline]
-    ORCH --> AGENTS[Support and Domain Agents]
-    ORCH --> MEM[FAISS Memory + Embeddings]
-    ORCH --> SVC[Database and LLM Services]
+    UI["Frontend — React 18 + Vite (gamified UI)<br/>HUD · Quest Console · Lab Grid · Mission Stats · Quest Log<br/>Achievements · Run Library · Toasts"] --> API1["Backend (1) — backend/app · FastAPI"]
+
+    UI -. optional .-> API2["Backend (2) — agentforge/api · FastAPI<br/>(separate port, comprehensive scaffold)"]
+
+    API1 --> ROUTERS["Routers<br/>auth · health · orchestrator"]
+    ROUTERS --> ORCH["Orchestrator Pipeline<br/>intent_parser → task_router →<br/>conflict_detector → iterative loop"]
+    ORCH --> AGENTS["Agents<br/>support_agent · domain_agent"]
+    ORCH --> MEM["Memory (stubs)<br/>FaissStore · EmbeddingService"]
+    ORCH --> SVC["Services<br/>database (Postgres) · llm_wrapper"]
+    SVC --> DB[(PostgreSQL — run_history table)]
+
+    API2 --> AGLOOP["agentforge.core.agent_loop<br/>Orchestrator → AgentLoop"]
+    AGLOOP --> AGCREW["Agents<br/>data · training · eval · failure_analyst · improvement"]
+    AGLOOP --> MCP["MCP Tool Catalog<br/>data / training / evaluation / improvement / memory"]
+    AGLOOP --> EXPLOG["memory<br/>vector_store · experiment_log"]
+    AGLOOP --> TRACE["observability<br/>tracer"]
+    AGLOOP -. Phase 3 .-> ROS["robotics<br/>ros_connector (stub)"]

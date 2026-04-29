@@ -1,25 +1,38 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    setSubmitted(true);
   };
 
   return (
-    <section className="panel">
-      <h2>Register</h2>
-      <p>Bootstrap a local account profile for this development build.</p>
+    <section className="auth-card" aria-labelledby="register-title">
+      <div className="auth-card__crest" aria-hidden="true">⚙</div>
+      <h2 id="register-title">Forge Your Scientist</h2>
+      <p className="auth-tagline">
+        Bootstrap a local profile. The dev backend currently honors any login on{" "}
+        <code>/api/auth/login</code>.
+      </p>
+
       <form className="form-grid" onSubmit={handleSubmit}>
         <label>
-          Name
-          <input value={name} onChange={(event) => setName(event.target.value)} required />
+          Codename
+          <input
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="Dr. Forge"
+            required
+          />
         </label>
         <label>
-          Email
+          Comm Channel <span className="label-hint">(email)</span>
           <input
             value={email}
             onChange={(event) => setEmail(event.target.value)}
@@ -28,7 +41,7 @@ function RegisterPage() {
           />
         </label>
         <label>
-          Password
+          Access Cipher
           <input
             value={password}
             onChange={(event) => setPassword(event.target.value)}
@@ -36,10 +49,18 @@ function RegisterPage() {
             required
           />
         </label>
-        <button type="submit">Create Account</button>
+        <button className="btn-primary" type="submit">Forge Profile</button>
       </form>
-      <p className="muted">
-        Registration endpoint is not implemented yet, but this complete UI is ready for backend wiring.
+
+      {submitted && (
+        <div className="banner banner--info">
+          Profile drafted locally. Use any credentials on the login page; the backend register
+          endpoint is on the roadmap.
+        </div>
+      )}
+
+      <p className="auth-foot">
+        Already credentialed? <Link to="/">Enter the Lab →</Link>
       </p>
     </section>
   );

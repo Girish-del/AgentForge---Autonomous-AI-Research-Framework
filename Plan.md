@@ -100,23 +100,27 @@ The system is **model-agnostic**, **skill-composable**, and **fully observable**
 
 ## 4. Technology Stack
 
-| Layer | Technology |
-|---|---|
-| **Agent Orchestration** | LangGraph, custom Python DAG |
-| **LLM Backbone** | Claude 3.5 Sonnet (reasoning), GPT-4o (fallback) |
-| **VLM Support** | Gemini 1.5 Pro Vision, LLaVA, GPT-4V |
-| **Tool/Skill Layer** | MCP (Model Context Protocol) |
-| **Training Framework** | PyTorch, HuggingFace Transformers, Accelerate |
-| **Robotics Sim** | ROS 2, Gazebo, Isaac Sim |
-| **Vector DB / RAG** | PostgreSQL 16 + pgvector |
-| **Eval Harness** | lm-evaluation-harness, custom eval runners |
-| **Experiment Tracking** | MLflow or Weights & Biases |
-| **Workflow Scheduling** | Prefect or Temporal |
-| **Observability** | OpenTelemetry, Grafana, custom dashboard (React) |
-| **API Layer** | FastAPI (Python) |
-| **Containerization** | Docker, Docker Compose |
-| **CI/CD** | GitHub Actions |
-| **Frontend Dashboard** | React + TypeScript + Tailwind |
+The right column marks what is **shipping** in the current codebase versus what is
+**aspirational** (planned for later phases).
+
+| Layer | Technology | Status |
+|---|---|---|
+| **Agent Orchestration** | Custom Python DAG (deterministic) — LangGraph deferred | ✅ DAG / 🔜 LangGraph |
+| **LLM Backbone** | Claude 3.5 Sonnet (reasoning), GPT-4o (fallback) | 🔜 Provider wrapper stub only (`LLMWrapper`) |
+| **VLM Support** | Gemini 1.5 Pro Vision, LLaVA, GPT-4V | 🔜 Listed in `MODEL_MATRIX` only |
+| **Tool/Skill Layer** | MCP (Model Context Protocol) | ✅ Scaffold under `agentforge/mcp/` |
+| **Training Framework** | PyTorch, HuggingFace Transformers, Accelerate | 🔜 Stubbed |
+| **Robotics Sim** | ROS 2, Gazebo, Isaac Sim | 🔜 `agentforge/robotics/ros_connector.py` stub |
+| **Vector DB / RAG** | PostgreSQL 16 + pgvector | ⚠️ pgvector image provisioned, no `vector` columns yet |
+| **Eval Harness** | lm-evaluation-harness, custom eval runners | 🔜 `eval/` is a placeholder |
+| **Experiment Tracking** | MLflow or Weights & Biases | 🔜 Not wired |
+| **Workflow Scheduling** | Prefect or Temporal | 🔜 Not wired |
+| **Observability** | OpenTelemetry, Grafana, custom dashboard (React) | ⚠️ Custom dashboard ✅, OTel/Grafana 🔜 |
+| **API Layer** | FastAPI (Python) | ✅ Two FastAPI apps: `backend/app/` and `agentforge/api/` |
+| **Containerization** | Docker, Docker Compose | ✅ Implemented |
+| **CI/CD** | GitHub Actions | ✅ Backend pytest + frontend `npm run build` |
+| **Frontend Dashboard** | React 18 + Vite + plain JSX + custom CSS (gamified UI) — TypeScript / Tailwind deferred | ✅ Implemented (no TS/Tailwind yet) |
+| **Frontend gamification** | XP / levels / achievements / streaks via `localStorage` | ✅ Implemented |
 
 ---
 
@@ -200,60 +204,82 @@ A live React dashboard provides:
 
 ## 9. Repository Structure
 
+The project ships as a monorepo. The plan-aligned package lives at `agentforge/`,
+the user-facing API + UI live at `backend/app/` and `frontend/`, and tests are
+shared.
+
 ```
-agentforge-research/
-├── core/
-│   ├── orchestrator.py         # Main goal-to-DAG planner
-│   ├── agent_loop.py           # Collect → Train → Eval → Improve loop
-│   └── model_selector.py       # Model routing logic
-├── agents/
-│   ├── data_agent.py
-│   ├── training_agent.py
-│   ├── eval_agent.py
-│   ├── failure_analyst.py
-│   └── improvement_agent.py
-├── mcp/                        # All MCP tool definitions
-├── memory/
-│   ├── vector_store.py         # pgvector integration
-│   └── experiment_log.py       # Structured run history
-├── dashboard/                  # React frontend
-├── api/                        # FastAPI backend
-├── tests/                      # Pytest suite
-├── docker-compose.yml
+.
+├── frontend/                   # React 18 + Vite gamified UI
+├── backend/                    # User-facing FastAPI service
+│   └── app/
+│       ├── routers/            # auth, orchestrator, health
+│       ├── services/           # database (Postgres), auth, llm wrapper
+│       ├── orchestrator/       # intent parser, task router, conflict
+│       │                       # detector, pipeline, reporting, tracing
+│       ├── memory/             # FAISS store + embedding stubs
+│       ├── agents/             # support_agent, domain_agent
+│       └── models/             # schemas, domain dataclasses
+├── agentforge/                 # Comprehensive plan scaffold
+│   ├── core/                   # orchestrator, agent_loop, model_selector
+│   ├── agents/                 # data, training, eval, failure_analyst,
+│   │                           # improvement
+│   ├── mcp/                    # data, training, evaluation, improvement,
+│   │                           # memory tool stubs
+│   ├── memory/                 # vector_store, experiment_log
+│   ├── observability/          # tracer
+│   ├── robotics/               # ros_connector stub
+│   └── api/                    # standalone FastAPI exposing /research/run
+├── tests/backend/              # Pytest suite
+├── docs/                       # architecture.mmd, BUILD_PARTS_GUIDE.md,
+│                               # PROJECT_PLAN.txt
+├── eval/                       # placeholder for Phase 4
+├── docker-compose.yml          # frontend + backend + pgvector image
 ├── pyproject.toml
-└── README.md
+├── Plan.md (this file)
+├── Project.md
+└── Readme.md
 ```
 
 ---
 
 ## 10. Milestones & Phases
 
-### Phase 1 — Foundation (Weeks 1–3)
-- Orchestrator + basic DAG runner
-- Data Collection Agent (HF datasets + simulation stub)
-- Manual training runner (PyTorch)
-- MLflow experiment tracking
-- Basic REST API
+### Phase 1 — Foundation (Weeks 1–3) ✅ Mostly done
+- ✅ Orchestrator + basic DAG runner (`agentforge/core/orchestrator.py`,
+  `backend/app/orchestrator/pipeline.py`)
+- ⚠️ Data Collection Agent — stub at `agentforge/agents/data_agent.py`
+  (no HF / simulation calls yet)
+- 🔜 Manual training runner (PyTorch)
+- 🔜 MLflow experiment tracking
+- ✅ Basic REST API (`backend/app/main.py` + `agentforge/api/main.py`)
+- ✅ PostgreSQL run-history persistence
 
-### Phase 2 — Autonomy Core (Weeks 4–7)
-- Full agent loop (collect → train → eval → improve)
-- MCP tool layer with all core skills
-- Model Selector sub-agent
-- pgvector memory store
-- LangGraph integration
+### Phase 2 — Autonomy Core (Weeks 4–7) — In progress
+- ✅ Full agent loop scaffold (collect → select → train → evaluate → analyze →
+  improve → report) in both `backend/app/orchestrator/pipeline.py` and
+  `agentforge/core/agent_loop.py`
+- ✅ MCP tool catalog scaffold under `agentforge/mcp/`
+- ✅ Model Selector sub-agent (`agentforge/mcp/training/select_model.py`,
+  `backend/app/orchestrator/task_router.py`)
+- 🔜 Real pgvector memory store (currently a Python list in `FaissStore`)
+- 🔜 LangGraph integration
+- 🔜 Real LLM provider wiring (currently `LLMWrapper` stub)
 
-### Phase 3 — Robotics Integration (Weeks 8–11)
-- ROS 2 / Gazebo simulation connector
-- VLM-based failure analysis (visual inputs)
-- Synthetic data generation pipeline
-- Real robot eval harness
+### Phase 3 — Robotics Integration (Weeks 8–11) — Stubbed
+- ⚠️ ROS 2 / Gazebo simulation connector — `agentforge/robotics/ros_connector.py`
+- 🔜 VLM-based failure analysis (visual inputs)
+- 🔜 Synthetic data generation pipeline
+- 🔜 Real robot eval harness
 
-### Phase 4 — Observability & Polish (Weeks 12–14)
-- Full React dashboard
-- OpenTelemetry tracing
-- Auto-generated research report output
-- Multi-goal parallel experiment runs
-- Public benchmark eval suite
+### Phase 4 — Observability & Polish (Weeks 12–14) — UI partially done
+- ✅ Gamified React dashboard (XP, levels, agent crew, quest log,
+  achievements, run library)
+- ⚠️ Trace recorder writes to memory only (`TraceRecorder`)
+- 🔜 OpenTelemetry tracing + Grafana
+- 🔜 Auto-generated research report output (current report is a structured dict)
+- 🔜 Multi-goal parallel experiment runs
+- 🔜 Public benchmark eval suite
 
 ---
 
@@ -268,4 +294,6 @@ agentforge-research/
 
 ---
 
-*Generated for AgentForge Research — April 2026*
+*Generated for AgentForge Research — April 2026. Status annotations updated April 2026
+to reflect the current monorepo state. The status legend: ✅ shipping, ⚠️ partial /
+stub, 🔜 not yet started.*

@@ -1,20 +1,38 @@
 AgentForge Production Plan
 ==========================
+Status legend: [x] shipping  [~] partial / stub  [ ] not yet started
 
-Phase 1
-- Ship monorepo structure
-- Stand up backend API skeleton
-- Stand up frontend Vite app
-- Add docker compose and CI
+Phase 1 — Foundation
+- [x] Ship monorepo structure (frontend, backend, agentforge, tests, docs, docker)
+- [x] Stand up backend API skeleton (backend/app/main.py)
+- [x] Stand up frontend Vite app (gamified UI on top: HUD, agents, quests, achievements)
+- [x] Add docker-compose and CI (backend pytest + frontend build)
 
-Phase 2
-- Add persistent database integration
-- Add real FAISS + sentence-transformer memory
-- Add authentication and role model
+Phase 2 — Persistence, Memory, Auth
+- [x] PostgreSQL run_history table + GET/POST endpoints + UI Run Library
+- [~] FAISS + sentence-transformer memory — current code is a Python list + placeholder
+      embedding (backend/app/memory/*.py)
+- [~] Auth scaffold — POST /api/auth/login returns a fixed dev token; JWT validation,
+      RBAC, and a register endpoint are still pending
 
-Phase 3
-- Add autonomous agent loop with checkpoints and retries
-- Add evaluation harness and benchmark jobs
+Phase 3 — Autonomous loop
+- [x] Iterative collect → select → train → evaluate → analyze → improve → report loop
+      in both backend/app/orchestrator/pipeline.py and agentforge/core/agent_loop.py
+- [x] Conflict detector (budget vs iterations)
+- [x] Trace recorder + structured report
+- [ ] Real model training and eval; current numbers are deterministic simulations
+- [ ] Evaluation harness scripts under eval/
 
-Phase 4
-- Add observability, dashboards, and release hardening
+Phase 4 — Observability and release
+- [x] Frontend gamified dashboard (level, XP, achievements, run library)
+- [ ] OpenTelemetry tracing + Grafana
+- [ ] Release workflow, image tagging, and deployment manifests
+- [ ] Scale and performance tests for orchestrator and API
+
+Open questions / known gaps:
+- Two FastAPI apps coexist (backend/app and agentforge/api). Decide whether to merge,
+  expose via gateway, or keep them as separate services.
+- pgvector image is provisioned but no `vector` columns are created — RAG path is
+  scaffolded but not wired.
+- LLMWrapper is a stub. Production runs will need real provider integration before the
+  loop's metric numbers reflect anything other than the deterministic curve.
