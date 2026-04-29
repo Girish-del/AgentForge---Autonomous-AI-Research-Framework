@@ -15,13 +15,12 @@ loop.
 
 ## Login Page 
 
-image.png
+![Login Page](Project Preview/Login Page.png)
 
 
 ## Main Researh Page 
 
-image.png
-
+![Main Screen](Project Preview/Main Screen.png)
 
 ## Architecture
 
