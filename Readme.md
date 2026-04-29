@@ -18,7 +18,7 @@ loop.
 ![Login Page](./Project%20Preview/Login%20Page.png)
 
 
-## Main Researh Page 
+## Main Research Page 
 
 ![Main Screen](./Project%20Preview/Main%20Screen.png)
 
